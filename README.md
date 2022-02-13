@@ -1,3 +1,9 @@
+# kcengine
+
+name inspired by my youtube handle lmao
+
+has stuff idk im too lazy for readme shit
+
 # Friday Night Funkin
 
 This is the repository for Friday Night Funkin, a game originally made for Ludum Dare 47 "Stuck In a Loop".
