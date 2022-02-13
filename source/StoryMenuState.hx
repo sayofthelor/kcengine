@@ -1,5 +1,8 @@
 package;
 
+import openfl.Lib;
+import haxe.Json;
+import openfl.utils.Assets;
 #if desktop
 import Discord.DiscordClient;
 #end
@@ -18,41 +21,47 @@ import lime.net.curl.CURLCode;
 
 using StringTools;
 
+typedef WeekData = {
+	var name:String;
+	var songs:Array<String>;
+	var characters:Array<String>;
+}
+
 class StoryMenuState extends MusicBeatState
 {
 	var scoreText:FlxText;
 
 	var weekData:Array<Dynamic> = [
-		['Tutorial'],
-		['Bopeebo', 'Fresh', 'Dadbattle'],
-		['Spookeez', 'South', "Monster"],
-		['Pico', 'Philly', "Blammed"],
-		['Satin-Panties', "High", "Milf"],
-		['Cocoa', 'Eggnog', 'Winter-Horrorland'],
-		['Senpai', 'Roses', 'Thorns']
+		// ['Tutorial'],
+		//['Bopeebo', 'Fresh', 'Dadbattle'],
+		// ['Spookeez', 'South', "Monster"],
+		// ['Pico', 'Philly', "Blammed"],
+		// ['Satin-Panties', "High", "Milf"],
+		// ['Cocoa', 'Eggnog', 'Winter-Horrorland'],
+		// ['Senpai', 'Roses', 'Thorns']
 	];
 	var curDifficulty:Int = 1;
 
 	public static var weekUnlocked:Array<Bool> = [true, true, true, true, true, true, true];
 
 	var weekCharacters:Array<Dynamic> = [
-		['dad', 'bf', 'gf'],
-		['dad', 'bf', 'gf'],
-		['spooky', 'bf', 'gf'],
-		['pico', 'bf', 'gf'],
-		['mom', 'bf', 'gf'],
-		['parents-christmas', 'bf', 'gf'],
-		['senpai', 'bf', 'gf']
+		// ['dad', 'bf', 'gf'],
+		// ['dad', 'bf', 'gf'],
+		// ['spooky', 'bf', 'gf'],
+		// ['pico', 'bf', 'gf'],
+		// ['mom', 'bf', 'gf'],
+		// ['parents-christmas', 'bf', 'gf'],
+		// ['senpai', 'bf', 'gf']
 	];
 
 	var weekNames:Array<String> = [
-		"",
-		"Daddy Dearest",
-		"Spooky Month",
-		"PICO",
-		"MOMMY MUST MURDER",
-		"RED SNOW",
-		"hating simulator ft. moawling"
+		// "",
+		// "Daddy Dearest",
+		// "Spooky Month",
+		// "PICO",
+		// "MOMMY MUST MURDER",
+		// "RED SNOW",
+		// "hating simulator ft. moawling"
 	];
 
 	var txtWeekTitle:FlxText;
@@ -73,6 +82,11 @@ class StoryMenuState extends MusicBeatState
 
 	override function create()
 	{
+
+		readWeekFile();
+
+		trace(weekData, weekCharacters, weekData);
+
 		transIn = FlxTransitionableState.defaultTransIn;
 		transOut = FlxTransitionableState.defaultTransOut;
 
@@ -434,6 +448,8 @@ class StoryMenuState extends MusicBeatState
 			txtTracklist.text += "\n" + i;
 		}
 
+		txtTracklist.text += "\n";
+
 		txtTracklist.text = txtTracklist.text.toUpperCase();
 
 		txtTracklist.screenCenter(X);
@@ -442,5 +458,19 @@ class StoryMenuState extends MusicBeatState
 		#if !switch
 		intendedScore = Highscore.getWeekScore(curWeek, curDifficulty);
 		#end
+	}
+
+	public function addWeek(weekDataDef:WeekData) {
+		weekNames.push(weekDataDef.name);
+		weekData.push(weekDataDef.songs);
+		weekCharacters.push(weekDataDef.characters);
+	}
+
+	public function readWeekFile(path:String = 'weeks') {
+		var weeks = Json.parse(Assets.getText(Paths.json(path, 'preload'))).weeks;
+
+		for (i in 0...weeks.length) {
+			addWeek(cast weeks[i]);
+		}
 	}
 }

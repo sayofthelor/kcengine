@@ -1,5 +1,8 @@
 package;
 
+import Character.CharacterManager;
+import openfl.filters.ShaderFilter;
+import ColorBlindEffect.ColorBlindnessType;
 import Conductor.BPMChangeEvent;
 import flixel.FlxG;
 import flixel.addons.transition.FlxTransitionableState;
@@ -9,6 +12,9 @@ import flixel.util.FlxTimer;
 
 class MusicBeatState extends FlxUIState
 {
+
+	public static var saveInitted:Bool = false;
+
 	private var lastBeat:Float = 0;
 	private var lastStep:Float = 0;
 
@@ -16,19 +22,50 @@ class MusicBeatState extends FlxUIState
 	private var curBeat:Int = 0;
 	private var controls(get, never):Controls;
 
-	inline function get_controls():Controls
-		return PlayerSettings.player1.controls;
+	public var colorBlindnessEffect:ColorBlindEffect;
 
-	override function create()
-	{
+	inline function get_controls():Controls {
+		if (Prefs.dfjk)
+		PlayerSettings.player1.controls.setKeyboardScheme(DFJK);
+		else
+			PlayerSettings.player1.setKeyboardScheme(Solo);
+		return PlayerSettings.player1.controls;
+	}
+
+	public function new() {
+		if (!saveInitted) {
+			saveInitted = true;
+			Prefs.init();
+			trace('initted player prefs');
+		}
+
+		if (CharacterManager.colorMap == null) {
+			CharacterManager.getColors();
+		}
+		super();
+	}
+
+	override function create() {
 		if (transIn != null)
 			trace('reg ' + transIn.region);
 
 		super.create();
+
+		colorBlindnessEffect = new ColorBlindEffect(NONE);
+		
+		if (colorBlindnessEffect.shader.blindnessType.value[0] != NONE) {
+			FlxG.camera.setFilters([new ShaderFilter(colorBlindnessEffect.shader)]);
+			FlxG.cameras.cameraAdded.add((cam) -> {
+				cam.setFilters([new ShaderFilter(colorBlindnessEffect.shader)]);
+			});
+		}
 	}
 
 	override function update(elapsed:Float)
 	{
+
+		
+
 		//everyStep();
 		var oldStep:Int = curStep;
 

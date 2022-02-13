@@ -70,19 +70,32 @@ class Paths
 		return getPath('data/$key.json', TEXT, library);
 	}
 
-	static public function sound(key:String, ?library:String)
+	inline static public function sound(key:String, ?library:String)
 	{
 		return getPath('sounds/$key.$SOUND_EXT', SOUND, library);
+	}
+
+	inline static public function soundWav(key:String, ?library:String) {
+		return getPath('sounds/$key.wav', SOUND, library);
 	}
 
 	inline static public function soundRandom(key:String, min:Int, max:Int, ?library:String)
 	{
 		return sound(key + FlxG.random.int(min, max), library);
+	}	
+	
+	inline static public function soundRandomWab(key:String, min:Int, max:Int, ?library:String)
+	{
+		return soundWav(key + FlxG.random.int(min, max), library);
 	}
 
 	inline static public function music(key:String, ?library:String)
 	{
 		return getPath('music/$key.$SOUND_EXT', MUSIC, library);
+	}
+
+	inline static public function musicWav(key:String, ?library:String) {
+		return getPath('music/$key.wav', MUSIC, library);
 	}
 
 	inline static public function voices(song:String)
@@ -103,6 +116,10 @@ class Paths
 	inline static public function font(key:String)
 	{
 		return 'assets/fonts/$key';
+	}
+
+	inline static public function script(key:String, ?library:String = 'preload') {
+		return getPath('data/$key.hx', TEXT, library);
 	}
 
 	inline static public function getSparrowAtlas(key:String, ?library:String)

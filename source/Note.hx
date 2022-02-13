@@ -21,8 +21,13 @@ class Note extends FlxSprite
 	public var wasGoodHit:Bool = false;
 	public var prevNote:Note;
 
+	public var missed:Bool = false;
+
 	public var sustainLength:Float = 0;
 	public var isSustainNote:Bool = false;
+	public var sustainParent:Note;
+	public var sustainChildren:Array<Note> = [];
+	public var isLockedSustain:Bool;
 
 	public var noteScore:Float = 1;
 
@@ -50,6 +55,14 @@ class Note extends FlxSprite
 		this.noteData = noteData;
 
 		var daStage:String = PlayState.curStage;
+
+		if (isSustainNote && !prevNote.isSustainNote) {
+			sustainParent = prevNote;
+			prevNote.sustainChildren.push(this);
+		} else if (isSustainNote && prevNote.isSustainNote) {
+			sustainParent = prevNote.sustainParent;
+			sustainParent.sustainChildren.push(this);
+		}
 
 		switch (daStage)
 		{

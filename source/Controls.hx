@@ -85,6 +85,7 @@ enum KeyboardScheme
 	Solo;
 	Duo(first:Bool);
 	None;
+	DFJK;
 	Custom;
 }
 
@@ -524,8 +525,17 @@ class Controls extends FlxActionSet
 				inline bindKeys(Control.BACK, [P]);
 				inline bindKeys(Control.PAUSE, [ENTER]);
 				inline bindKeys(Control.RESET, [BACKSPACE]);
-			case None: // nothing
-			case Custom: // nothing
+			case DFJK:
+				inline bindKeys(Control.UP, [FlxKey.UP, FlxKey.J]);
+				inline bindKeys(Control.DOWN, [FlxKey.DOWN, FlxKey.F]);
+				inline bindKeys(Control.LEFT, [FlxKey.LEFT, FlxKey.D]);
+				inline bindKeys(Control.RIGHT, [FlxKey.RIGHT, FlxKey.K]);
+				inline bindKeys(Control.ACCEPT, [Z, SPACE, ENTER]);
+				inline bindKeys(Control.BACK, [BACKSPACE, ESCAPE]);
+				inline bindKeys(Control.PAUSE, [P, ENTER, ESCAPE]);
+				inline bindKeys(Control.RESET, [R]);
+			default:
+				// nothing
 		}
 		#else
 		switch (scheme)
