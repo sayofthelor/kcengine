@@ -10,6 +10,10 @@ import polymod.format.ParseRules.TargetSignatureElement;
 
 using StringTools;
 
+enum abstract NoteEvent(String) from String to String {
+	var None:String = "none";
+	var Hey:String = "hey";
+}
 class Note extends FlxSprite
 {
 	public var strumTime:Float = 0;
@@ -31,13 +35,18 @@ class Note extends FlxSprite
 
 	public var noteScore:Float = 1;
 
+	public var isEvent:Bool = false;
+	public var eventType:NoteEvent;
+
+	public var inEditor:Bool = false;
+
 	public static var swagWidth:Float = 160 * 0.7;
 	public static var PURP_NOTE:Int = 0;
 	public static var GREEN_NOTE:Int = 2;
 	public static var BLUE_NOTE:Int = 1;
 	public static var RED_NOTE:Int = 3;
 
-	public function new(strumTime:Float, noteData:Int, ?prevNote:Note, ?sustainNote:Bool = false)
+	public function new(strumTime:Float, noteData:Int, ?prevNote:Note, ?isSustainNote:Bool = false, ?inEditor:Bool = false, ?isEvent:Bool = false, ?eventType:NoteEvent = None)
 	{
 		super();
 
@@ -45,7 +54,10 @@ class Note extends FlxSprite
 			prevNote = this;
 
 		this.prevNote = prevNote;
-		isSustainNote = sustainNote;
+		this.isSustainNote = isSustainNote;
+		this.isEvent = isEvent;
+		this.eventType = eventType;
+		this.inEditor = inEditor;
 
 		x += 50;
 		// MAKE SURE ITS DEFINITELY OFF SCREEN?
@@ -56,13 +68,15 @@ class Note extends FlxSprite
 
 		var daStage:String = PlayState.curStage;
 
-		if (isSustainNote && !prevNote.isSustainNote) {
-			sustainParent = prevNote;
-			prevNote.sustainChildren.push(this);
-		} else if (isSustainNote && prevNote.isSustainNote) {
-			sustainParent = prevNote.sustainParent;
-			sustainParent.sustainChildren.push(this);
+		if (!inEditor) {
+			if (isSustainNote && !prevNote.isSustainNote) {
+				sustainParent = prevNote;
+				prevNote.sustainChildren.push(this);
+			} else if (isSustainNote && prevNote.isSustainNote) {
+				sustainParent = prevNote.sustainParent;
+				sustainParent.sustainChildren.push(this);
 		}
+	}
 
 		switch (daStage)
 		{

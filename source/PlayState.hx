@@ -85,6 +85,9 @@ class PlayState extends MusicBeatState
 	private var healthBarBG:FlxSprite;
 	private var healthBar:FlxBar;
 
+	private var timeBarBG:FlxSprite;
+	private var timeBar:FlxBar;
+
 	public var noteSplashGroup:FlxTypedGroup<NoteSplash>;
 
 	private var generatedMusic:Bool = false;
@@ -137,6 +140,8 @@ class PlayState extends MusicBeatState
 	var detailsPausedText:String = "";
 	#end
 
+	public var songPercent:Float = 0;
+	public var updateTime:Bool = true;
 
 	override public function create()
 	{
@@ -574,7 +579,7 @@ class PlayState extends MusicBeatState
 		          }
               }
 
-		var gfVersion:String = 'gf';
+		var gfVersion:String;
 
 		switch (curStage)
 		{
@@ -586,10 +591,9 @@ class PlayState extends MusicBeatState
 				gfVersion = 'gf-pixel';
 			case 'schoolEvil':
 				gfVersion = 'gf-pixel';
+			default:
+				gfVersion = 'gf';
 		}
-
-		if (curStage == 'limo')
-			gfVersion = 'gf-car';
 
 		gf = new Character(400, 130, gfVersion);
 		gf.scrollFactor.set(0.95, 0.95);
@@ -1285,6 +1289,8 @@ class PlayState extends MusicBeatState
 				resyncVocals();
 			}
 
+			updateTime = true;
+
 			if (!startTimer.finished)
 				startTimer.active = true;
 			paused = false;
@@ -1379,6 +1385,10 @@ class PlayState extends MusicBeatState
 				// phillyCityLights.members[curLight].alpha -= (Conductor.crochet / 1000) * FlxG.elapsed;
 		}
 
+		if (updateTime) {
+			songPercent = Conductor.songPosition / FlxG.sound.music.length;
+		}
+
 		super.update(elapsed);
 
 		scoreTxt.text = "Score:" + songScore;
@@ -1395,8 +1405,10 @@ class PlayState extends MusicBeatState
 				// gitaroo man easter egg
 				FlxG.switchState(new GitarooPause());
 			}
-			else
+			else {
 				openSubState(new PauseSubState(boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y));
+				updateTime = false;
+			}
 		
 			#if desktop
 			DiscordClient.changePresence(detailsPausedText, SONG.song + " (" + storyDifficultyText + ")", iconRPC);
@@ -2331,14 +2343,29 @@ class PlayState extends MusicBeatState
 		}
 	}
 
+
+	function performNoteEvent(note:Note) {
+		
+		switch (note.eventType) {
+				
+		}
+	}
+
 	function noteCheck(keyP:Bool, note:Note):Void
 	{
-		if (keyP)
-			goodNoteHit(note);
-		else
-		{
+
+		
+		if (note.isEvent)
+			performNoteEvent(note);
+		else {
+			if (keyP)
+				goodNoteHit(note);
+			else
+			{
+
 			if (!Prefs.ghostTapping)
-			badNoteCheck(note);
+				badNoteCheck(note);
+			}
 		}
 	}
 
@@ -2455,11 +2482,11 @@ class PlayState extends MusicBeatState
 
 	public function spawnNoteSplash(note:Note) {
 		var staticNote:FlxSprite = playerStrums.members[note.noteData];
-		createNoteSplash(staticNote.x, staticNote.y, note);
+		createNoteSplash(staticNote.x, staticNote.y);
 	}
 
-	public function createNoteSplash(x:Float, y:Float, note:Note) {
-		var splash:NoteSplash = new NoteSplash(x, y, note.noteData, note);
+	public function createNoteSplash(x:Float, y:Float, note:Note, staticNote:FlxSprite) {
+		var splash:NoteSplash = new NoteSplash(x, y, note.noteData);
 		noteSplashGroup.add(splash);
 	}
 

@@ -35,6 +35,7 @@ class MusicBeatState extends FlxUIState
 	public function new() {
 		if (!saveInitted) {
 			saveInitted = true;
+			Prefs.testing();
 			Prefs.init();
 			trace('initted player prefs');
 		}

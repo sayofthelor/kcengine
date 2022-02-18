@@ -6,25 +6,21 @@ import flixel.graphics.frames.FlxAtlasFrames;
 
 class NoteSplash extends FlxSprite {
 
-    var note:Note;
-
     public function new(x:Float = 0, y:Float = 0, noteData:Int, note:Note) {
         super(x, y);
         frames = Paths.getSparrowAtlas('noteSplashes', 'preload');
         loadAnims();
-        setup(x, y, noteData, note);
+        setup(x, y, noteData);
         scrollFactor.set();
         antialiasing = true;
     }
     
-    public function setup(x:Float = 0, y:Float = 0, noteData:Int, note:Note) {
-
+    public function setup(x:Float = 0, y:Float = 0, noteData:Int) {
         setPosition(x - Note.swagWidth * 0.95, y - Note.swagWidth);
         offset.set(10, 10);
 
-        var num:Int = FlxG.random.int(1, 2);
 
-        animation.play('note' + noteData + '-' + num, true);
+        animation.play('note' + noteData + '-' + FlxG.random.int(1,2), true);
 
         if (animation.curAnim != null) {
             animation.curAnim.frameRate = 24 + FlxG.random.int(-2, 2);
@@ -33,6 +29,7 @@ class NoteSplash extends FlxSprite {
 
     public override function update(elapsed:Float) {
         super.update(elapsed);
+
         if (animation.curAnim.finished && animation.curAnim != null) {
             this.kill();
         }

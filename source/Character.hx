@@ -1,5 +1,8 @@
 package;
 
+import sys.FileSystem;
+import flixel.animation.FlxAnimation;
+import haxe.Json;
 import haxe.ds.StringMap;
 import openfl.utils.Assets;
 import flixel.FlxG;
@@ -37,6 +40,49 @@ class Character extends FlxSprite
 
 	public var healthbarColor:Int;
 
+	public function parseData(char:String) {
+		var fileData = Json.parse(Assets.getText(Paths.json(char)));
+		
+		var main = fileData.main;
+
+		var anims = fileData.anims;
+		
+		var offsets = fileData.offsets;
+
+		frames = Paths.getSparrowAtlas(main.animFile);
+		healthbarColor = Std.parseInt(main.color);
+		antialiasing = main.antialiasing;
+
+		
+
+		for (i in 0...fileData.anims.length) {
+
+			var looped:Bool = false;
+
+			looped = fileData.anims[i].looped;
+
+			//trace(fileData.anims[i]);
+
+			if (fileData.anims[i].indices != null) {
+				animation.addByIndices(fileData.anims[i].name, fileData.anims[i].prefix, fileData.anims[i].indices, "", 24, looped);
+			} else {
+				animation.addByPrefix(fileData.anims[i].name, fileData.anims[i].prefix, 24, looped);
+			}
+
+			if (fileData.anims[i].offset != null && fileData.anims[i].offset.length == 2) {
+				addOffset(fileData.anims[i].name, fileData.anims[i].offset[0], fileData.anims[i].offset[1]);
+			} else {
+				addOffset(fileData.anims[i].name, 0, 0);
+			}
+		}
+
+		if (char == 'gf-pixel')
+			setGraphicSize(Std.int(width * PlayState.daPixelZoom));
+
+		FlxG.log.add('SUCCESFULLY LOADED $char FROM JSON ');
+		trace('sucessfully loaded $char from json');
+	}
+
 	public function new(x:Float, y:Float, ?character:String = "bf", ?isPlayer:Bool = false)
 	{
 		super(x, y);
@@ -58,6 +104,15 @@ class Character extends FlxSprite
 		var tex:FlxAtlasFrames;
 		antialiasing = true;
 
+		if (FileSystem.exists(Paths.json('characters/'+curCharacter))) {
+			
+			trace('file found.. parsing and setting data');
+			parseData('characters/'+curCharacter);
+
+			trace(animation.getNameList());
+
+			trace('done!');
+		} else {
 		switch (curCharacter)
 		{
 			case 'gf':
@@ -148,7 +203,6 @@ class Character extends FlxSprite
 
 				playAnim('danceRight');
 
-				setGraphicSize(Std.int(width * PlayState.daPixelZoom));
 				updateHitbox();
 				antialiasing = false;
 
@@ -526,8 +580,13 @@ class Character extends FlxSprite
 
 				playAnim('idle');
 		}
+	}
 
-		dance();
+	if (curCharacter.startsWith('gf')) {
+		playAnim('danceRight');
+	}
+
+	dance();
 
 		if (isPlayer)
 		{
