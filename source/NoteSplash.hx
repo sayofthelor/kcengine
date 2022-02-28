@@ -6,7 +6,7 @@ import flixel.graphics.frames.FlxAtlasFrames;
 
 class NoteSplash extends FlxSprite {
 
-    public function new(x:Float = 0, y:Float = 0, noteData:Int, note:Note) {
+    public function new(x:Float = 0, y:Float = 0, noteData:Int) {
         super(x, y);
         frames = Paths.getSparrowAtlas('noteSplashes', 'preload');
         loadAnims();

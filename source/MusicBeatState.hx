@@ -1,5 +1,6 @@
 package;
 
+import Controls.KeyboardScheme;
 import Character.CharacterManager;
 import openfl.filters.ShaderFilter;
 import ColorBlindEffect.ColorBlindnessType;
@@ -25,7 +26,7 @@ class MusicBeatState extends FlxUIState
 	public var colorBlindnessEffect:ColorBlindEffect;
 
 	inline function get_controls():Controls {
-		if (Prefs.dfjk)
+		if (Prefs.keyboardScheme == KeyboardScheme.DFJK)
 		PlayerSettings.player1.controls.setKeyboardScheme(DFJK);
 		else
 			PlayerSettings.player1.setKeyboardScheme(Solo);

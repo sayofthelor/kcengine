@@ -60,6 +60,7 @@ enum Device
 {
 	Keys;
 	Gamepad(id:Int);
+
 }
 
 /**
@@ -86,6 +87,8 @@ enum KeyboardScheme
 	Duo(first:Bool);
 	None;
 	DFJK;
+	AS56;
+	WEOP;
 	Custom;
 }
 
@@ -533,6 +536,24 @@ class Controls extends FlxActionSet
 				inline bindKeys(Control.ACCEPT, [Z, SPACE, ENTER]);
 				inline bindKeys(Control.BACK, [BACKSPACE, ESCAPE]);
 				inline bindKeys(Control.PAUSE, [P, ENTER, ESCAPE]);
+				inline bindKeys(Control.RESET, [R]);
+			case AS56:
+				inline bindKeys(Control.UP, [FlxKey.UP, FlxKey.NUMPADFIVE]);
+				inline bindKeys(Control.DOWN, [FlxKey.DOWN, FlxKey.S]);
+				inline bindKeys(Control.LEFT, [FlxKey.LEFT, FlxKey.A]);
+				inline bindKeys(Control.RIGHT, [FlxKey.RIGHT, FlxKey.NUMPADSIX]);
+				inline bindKeys(Control.ACCEPT, [Z, SPACE, ENTER]);
+				inline bindKeys(Control.BACK, [BACKSPACE, ESCAPE]);
+				inline bindKeys(Control.PAUSE, [P, ENTER, ESCAPE]);
+				inline bindKeys(Control.RESET, [R]);
+			case WEOP:
+				inline bindKeys(Control.UP, [FlxKey.UP, FlxKey.O]);
+				inline bindKeys(Control.DOWN, [FlxKey.DOWN, FlxKey.E]);
+				inline bindKeys(Control.LEFT, [FlxKey.LEFT, FlxKey.W]);
+				inline bindKeys(Control.RIGHT, [FlxKey.RIGHT, FlxKey.P]);
+				inline bindKeys(Control.ACCEPT, [Z, SPACE, ENTER]);
+				inline bindKeys(Control.BACK, [BACKSPACE, ESCAPE]);
+				inline bindKeys(Control.PAUSE, [ENTER, ESCAPE]);
 				inline bindKeys(Control.RESET, [R]);
 			default:
 				// nothing

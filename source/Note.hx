@@ -10,9 +10,18 @@ import polymod.format.ParseRules.TargetSignatureElement;
 
 using StringTools;
 
+typedef EventNote = {
+	strumTime:Float,
+	event:String,
+	values:Array<Dynamic>
+}
+
 enum abstract NoteEvent(String) from String to String {
 	var None:String = "none";
 	var Hey:String = "hey";
+	var ChangeBF:String = "changeBF";
+	var ChangeGF:String = "changeGF";
+	var ChangeOpponent:String = "changeOpponent";
 }
 class Note extends FlxSprite
 {
@@ -35,8 +44,8 @@ class Note extends FlxSprite
 
 	public var noteScore:Float = 1;
 
-	public var isEvent:Bool = false;
-	public var eventType:NoteEvent;
+	public var eventName:String = '';
+	public var eventValues:Array<Dynamic> = [];
 
 	public var inEditor:Bool = false;
 
@@ -46,7 +55,7 @@ class Note extends FlxSprite
 	public static var BLUE_NOTE:Int = 1;
 	public static var RED_NOTE:Int = 3;
 
-	public function new(strumTime:Float, noteData:Int, ?prevNote:Note, ?isSustainNote:Bool = false, ?inEditor:Bool = false, ?isEvent:Bool = false, ?eventType:NoteEvent = None)
+	public function new(strumTime:Float, noteData:Int, ?prevNote:Note, ?isSustainNote:Bool = false, ?inEditor:Bool = false, ?eventType:NoteEvent = None, ?eventParams:Array<Dynamic>)
 	{
 		super();
 
@@ -55,8 +64,6 @@ class Note extends FlxSprite
 
 		this.prevNote = prevNote;
 		this.isSustainNote = isSustainNote;
-		this.isEvent = isEvent;
-		this.eventType = eventType;
 		this.inEditor = inEditor;
 
 		x += 50;
@@ -75,8 +82,8 @@ class Note extends FlxSprite
 			} else if (isSustainNote && prevNote.isSustainNote) {
 				sustainParent = prevNote.sustainParent;
 				sustainParent.sustainChildren.push(this);
+			}
 		}
-	}
 
 		switch (daStage)
 		{

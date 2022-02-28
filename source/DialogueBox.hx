@@ -1,5 +1,8 @@
 package;
 
+import flixel.math.FlxPoint;
+import openfl.utils.Assets;
+import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.addons.text.FlxTypeText;
@@ -9,8 +12,100 @@ import flixel.input.FlxKeyManager;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
+import haxe.Json;
 
 using StringTools;
+
+typedef Dialogue = {
+	var name:String;
+	var text:String;
+	var typingSpeed:Float;
+	var charAnim:String;
+	var boxAnim:String;
+}
+class _DialogueBox extends FlxTypedGroup<FlxSprite> {
+	
+	public var box:FlxSprite;
+	public var rightIcon:FlxSprite;
+	public var leftIcon:FlxSprite;
+	public var middleIcon:FlxSprite;
+
+	public var nameText:FlxText;
+	public var dialogueText:FlxTypeText;
+
+	public var x:Float = 0;
+	public var y:Float = 0;
+	public var angle:Float = 0;
+	public var alpha:Float = 1;
+
+	public var dialogue:Array<Dialogue>;
+
+	public var isTyping:Bool = false;
+
+	public function new(x:Float = 0, y:Float = 0) {
+		super();
+		this.x = x;
+		this.y = y;
+		this.memberAdded.add(function(spr:FlxSprite) {
+			spr.scrollFactor.set();
+		});
+
+		dialogue = new Array<Dialogue>();
+
+		dialogue = Json.parse(Assets.getText(Paths.json('dialogue/${PlayState.SONG.song.toLowerCase()}-dialogue', 'preload'))).dialogue;
+	
+		dialogueText.completeCallback = function() {
+			isTyping = false;
+		}
+	}
+
+	public override function update(elapsed:Float) {
+		super.update(elapsed);
+	}
+
+	public var index:Int = 0;
+
+	public var curChar:String;
+
+	public var dialogueEnded:Bool = false;
+
+	public function playDialogue(acceptKey:Bool, skipKey:Bool) {
+		if (acceptKey) {
+			if (dialogue.length - 1 > index) {
+				if (!isTyping) {
+					index++;
+					curChar = dialogue[index].name;
+					nameText.text = curChar;
+					dialogueText.resetText(dialogue[index].text);
+					dialogueText.start(dialogue[index].typingSpeed);
+					isTyping = true;
+				} else {
+					dialogueText.skip();
+					isTyping = false;
+				}
+			} else if (dialogue.length - 1 < index) {
+				trace('Dialogue Ended');
+				endDialogue();
+			}
+		} else if (skipKey) {
+			index = dialogue.length;
+			endDialogue();
+		}
+	}
+
+	public function endDialogue() {
+		for (i in this.members)
+				remove(i, true);
+		dialogueEnded = true;
+	}
+
+	public function sync() {
+		for (i in members) {
+			i.angle = angle;
+			i.alpha = alpha;
+		}
+	}
+}
 
 class DialogueBox extends FlxSpriteGroup
 {

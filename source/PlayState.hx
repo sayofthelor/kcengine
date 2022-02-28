@@ -1,5 +1,7 @@
 package;
 
+import Note.NoteEvent;
+import Note.EventNote;
 #if desktop
 import Discord.DiscordClient;
 #end
@@ -63,6 +65,7 @@ class PlayState extends MusicBeatState
 
 	public var notes:FlxTypedGroup<Note>;
 	public var unspawnNotes:Array<Note> = [];
+	public var eventNotes:Array<EventNote> = [];
 
 	public var strumLine:FlxSprite;
 	public var curSection:Int = 0;
@@ -121,6 +124,7 @@ class PlayState extends MusicBeatState
 	var talking:Bool = true;
 	var songScore:Int = 0;
 	var scoreTxt:FlxText;
+	var timeTxt:FlxText;
 
 	public static var campaignScore:Int = 0;
 
@@ -700,6 +704,7 @@ class PlayState extends MusicBeatState
 			strumLine.y = FlxG.height - 150;
 		}
 		strumLine.scrollFactor.set();
+		
 
 		strumLineNotes = new FlxTypedGroup<FlxSprite>();
 		add(strumLineNotes);
@@ -709,6 +714,44 @@ class PlayState extends MusicBeatState
 		playerStrums = new FlxTypedGroup<FlxSprite>();
 
 		dadStrums = new FlxTypedGroup<FlxSprite>();
+
+		healthBarBG = new FlxSprite(0, FlxG.height * 0.9).loadGraphic(Paths.image('healthBar'));
+		healthBarBG.screenCenter(X);
+		if (Prefs.downscroll) {
+			healthBarBG.y = 0.11 * FlxG.height;
+		}
+		healthBarBG.scrollFactor.set();
+		add(healthBarBG);
+		
+		healthBar = new FlxBar(healthBarBG.x + 4, healthBarBG.y + 4, RIGHT_TO_LEFT, Std.int(healthBarBG.width - 8), Std.int(healthBarBG.height - 8), this,
+			'health', 0, 2);
+		healthBar.scrollFactor.set();
+		healthBar.createFilledBar(dad.healthbarColor, boyfriend.healthbarColor);
+		// healthBar
+		add(healthBar);
+
+		if (Prefs.showTimeBar) {
+		timeBarBG = new FlxSprite(0, 23.5).loadGraphic(Paths.image('healthBar'));
+		timeBarBG.screenCenter(X);
+		if (Prefs.downscroll) {
+			timeBarBG.y = FlxG.height - 23.5;
+		}
+		timeBarBG.scrollFactor.set();
+		add(timeBarBG);
+
+		timeBar = new FlxBar(timeBarBG.x + 4, timeBarBG.y + 4, RIGHT_TO_LEFT, Std.int(timeBarBG.width - 8), Std.int(timeBarBG.height - 8), this, 'songPercent', 0, 1);
+		timeBar.scrollFactor.set();
+		timeBar.createFilledBar(FlxColor.WHITE, FlxColor.BLACK);
+		add(timeBar);
+
+		if (Prefs.showTimeBar) {
+		timeTxt = new FlxText(timeBarBG.x + timeBarBG.width / 2, timeBarBG.y - timeBarBG.height, 0, "", 32);
+		timeTxt.setFormat(Paths.font('vcr.ttf'), 32, FlxColor.WHITE, FlxTextAlign.CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		timeTxt.scrollFactor.set();
+		timeTxt.borderSize = 2;
+		}
+
+	}
 
 		// startCountdown();
 
@@ -737,21 +780,6 @@ class PlayState extends MusicBeatState
 
 		FlxG.fixedTimestep = false;
 
-		healthBarBG = new FlxSprite(0, FlxG.height * 0.9).loadGraphic(Paths.image('healthBar'));
-		healthBarBG.screenCenter(X);
-		if (Prefs.downscroll) {
-			healthBarBG.y = 0.11 * FlxG.height;
-		}
-		healthBarBG.scrollFactor.set();
-		add(healthBarBG);
-
-		healthBar = new FlxBar(healthBarBG.x + 4, healthBarBG.y + 4, RIGHT_TO_LEFT, Std.int(healthBarBG.width - 8), Std.int(healthBarBG.height - 8), this,
-			'health', 0, 2);
-		healthBar.scrollFactor.set();
-		healthBar.createFilledBar(dad.healthbarColor, boyfriend.healthbarColor);
-		// healthBar
-		add(healthBar);
-
 		scoreTxt = new FlxText(healthBarBG.x + healthBarBG.width - 190, healthBarBG.y + 30, 0, "", 20);
 		scoreTxt.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, RIGHT);
 		scoreTxt.scrollFactor.set();
@@ -767,6 +795,8 @@ class PlayState extends MusicBeatState
 
 		strumLineNotes.cameras = [camHUD];
 		notes.cameras = [camHUD];
+		timeBar.cameras = [camHUD];
+		timeBarBG.cameras = [camHUD];
 		healthBar.cameras = [camHUD];
 		healthBarBG.cameras = [camHUD];
 		iconP1.cameras = [camHUD];
@@ -834,6 +864,8 @@ class PlayState extends MusicBeatState
 		}
 
 		super.create();
+
+		updateTime = true;
 	}
 
 	function schoolIntro(?dialogueBox:DialogueBox):Void
@@ -1385,9 +1417,19 @@ class PlayState extends MusicBeatState
 				// phillyCityLights.members[curLight].alpha -= (Conductor.crochet / 1000) * FlxG.elapsed;
 		}
 
+		if (Prefs.showTimeBar) {
 		if (updateTime) {
-			songPercent = Conductor.songPosition / FlxG.sound.music.length;
+			var curTime:Float = Conductor.songPosition;
+			if(curTime < 0) curTime = 0;
+			songPercent = (curTime / songLength);
+			//trace(songPercent);
+			var songCalc = Math.floor(FlxG.sound.music.length - curTime);
+
+			var totalSeconds:Int = Math.floor(songCalc / 1000);
+
+			timeTxt.text = FlxStringUtil.formatTime(totalSeconds, false);
 		}
+	}
 
 		super.update(elapsed);
 
@@ -1955,7 +1997,7 @@ class PlayState extends MusicBeatState
 
 
 		if (daRating == 'sick' && Prefs.noteSplashes) {
-			spawnNoteSplash(note);
+			spawnNoteSplash(note.noteData);
 		}
 
 		songScore += score;
@@ -2321,7 +2363,6 @@ class PlayState extends MusicBeatState
 		var rightP = controls.RIGHT_P;
 		var downP = controls.DOWN_P;
 		var leftP = controls.LEFT_P;
-
 		if (!Prefs.ghostTapping && !note.missed) {
 				
 				note.missed = true;
@@ -2341,23 +2382,12 @@ class PlayState extends MusicBeatState
 			if (rightP)
 				noteMiss(3);
 		}
-	}
-
-
-	function performNoteEvent(note:Note) {
-		
-		switch (note.eventType) {
-				
-		}
+	
 	}
 
 	function noteCheck(keyP:Bool, note:Note):Void
 	{
-
 		
-		if (note.isEvent)
-			performNoteEvent(note);
-		else {
 			if (keyP)
 				goodNoteHit(note);
 			else
@@ -2365,7 +2395,47 @@ class PlayState extends MusicBeatState
 
 			if (!Prefs.ghostTapping)
 				badNoteCheck(note);
-			}
+			
+		}
+	}
+
+	function checkEventNote() {
+		while (eventNotes.length > 0) {
+
+			var evNote:EventNote = eventNotes[0];
+
+			if (Conductor.songPosition < evNote.strumTime)
+				break;
+
+			performEventNote(evNote.event, evNote.values);
+
+			eventNotes.shift();
+		}
+	}
+
+	function performEventNote(name:NoteEvent, values:Array<Dynamic>) {
+		switch (name) {
+			case Hey:
+				boyfriend.playAnim('hey');
+			case ChangeBF:
+				var x = boyfriend.x;
+				var y = boyfriend.y;
+				remove(boyfriend);
+				boyfriend = new Boyfriend(x, y, values[0]);
+				add(boyfriend);
+			case ChangeGF:
+				var x = gf.x;
+				var y = gf.y;
+				remove(gf);
+				gf = new Character(x, y, values[0]);
+				add(gf);
+			case ChangeOpponent:
+				var x = dad.x;
+				var y = dad.y;
+				remove(dad);
+				dad = new Character(x, y, values[0]);
+				add(dad);
+			default:
 		}
 	}
 
@@ -2480,13 +2550,13 @@ class PlayState extends MusicBeatState
 		}
 	}
 
-	public function spawnNoteSplash(note:Note) {
-		var staticNote:FlxSprite = playerStrums.members[note.noteData];
-		createNoteSplash(staticNote.x, staticNote.y);
+	public inline function spawnNoteSplash(noteData:Int) {
+		var staticNote:FlxSprite = playerStrums.members[noteData];
+		createNoteSplash(staticNote.x, staticNote.y, noteData);
 	}
 
-	public function createNoteSplash(x:Float, y:Float, note:Note, staticNote:FlxSprite) {
-		var splash:NoteSplash = new NoteSplash(x, y, note.noteData);
+	public inline function createNoteSplash(x:Float, y:Float, noteData:Int) {
+		var splash:NoteSplash = new NoteSplash(x, y, noteData);
 		noteSplashGroup.add(splash);
 	}
 
