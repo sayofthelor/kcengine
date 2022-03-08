@@ -119,7 +119,7 @@ class Paths
 	}
 
 	inline static public function script(key:String, ?library:String = 'preload') {
-		return getPath('data/$key.hx', TEXT, library);
+		return getPath('data/songs/$key.lua', TEXT, library);
 	}
 
 	inline static public function getSparrowAtlas(key:String, ?library:String)

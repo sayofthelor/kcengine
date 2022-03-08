@@ -85,21 +85,21 @@ class PlayState extends MusicBeatState
 	private var health:Float = 1;
 	private var combo:Int = 0;
 
-	private var healthBarBG:FlxSprite;
-	private var healthBar:FlxBar;
+	public var healthBarBG:FlxSprite;
+	public var healthBar:FlxBar;
 
-	private var timeBarBG:FlxSprite;
-	private var timeBar:FlxBar;
+	public var timeBarBG:FlxSprite;
+	public var timeBar:FlxBar;
 
 	public var noteSplashGroup:FlxTypedGroup<NoteSplash>;
 
 	private var generatedMusic:Bool = false;
 	private var startingSong:Bool = false;
 
-	private var iconP1:HealthIcon;
-	private var iconP2:HealthIcon;
-	private var camHUD:FlxCamera;
-	private var camGame:FlxCamera;
+	public var iconP1:HealthIcon;
+	public var iconP2:HealthIcon;
+	public var camHUD:FlxCamera;
+	public var camGame:FlxCamera;
 
 	var dialogue:Array<String> = ['blah blah blah', 'coolswag'];
 
@@ -146,6 +146,13 @@ class PlayState extends MusicBeatState
 
 	public var songPercent:Float = 0;
 	public var updateTime:Bool = true;
+
+	public static var instance:PlayState;
+
+	public function new() {
+		super();
+		instance = this;
+	}
 
 	override public function create()
 	{
@@ -213,6 +220,8 @@ class PlayState extends MusicBeatState
 
 		iconRPC = SONG.player2;
 
+		eventNotes = cast SONG.events;
+
 		// To avoid having duplicate images in Discord assets
 		switch (iconRPC)
 		{
@@ -233,6 +242,8 @@ class PlayState extends MusicBeatState
 		{
 			detailsText = "Freeplay";
 		}
+
+
 
 		// String for when the game is paused
 		detailsPausedText = "Paused - " + detailsText;
@@ -1138,6 +1149,7 @@ class PlayState extends MusicBeatState
 				var swagNote:Note = new Note(daStrumTime, daNoteData, oldNote);
 				swagNote.sustainLength = songNotes[2];
 				swagNote.scrollFactor.set(0, 0);
+				
 
 				var susLength:Float = swagNote.sustainLength;
 
@@ -2383,6 +2395,7 @@ class PlayState extends MusicBeatState
 				noteMiss(3);
 		}
 	
+	
 	}
 
 	function noteCheck(keyP:Bool, note:Note):Void
@@ -2482,8 +2495,9 @@ class PlayState extends MusicBeatState
 				note.kill();
 				notes.remove(note, true);
 				note.destroy();
+				}
 			}
-		}
+		
 	}
 
 	var fastCarCanDrive:Bool = true;

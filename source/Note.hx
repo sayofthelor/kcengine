@@ -55,6 +55,8 @@ class Note extends FlxSprite
 	public static var BLUE_NOTE:Int = 1;
 	public static var RED_NOTE:Int = 3;
 
+	public var isEvent:Bool = false;
+
 	public function new(strumTime:Float, noteData:Int, ?prevNote:Note, ?isSustainNote:Bool = false, ?inEditor:Bool = false, ?eventType:NoteEvent = None, ?eventParams:Array<Dynamic>)
 	{
 		super();
@@ -72,10 +74,10 @@ class Note extends FlxSprite
 		this.strumTime = strumTime;
 
 		this.noteData = noteData;
-
+		
 		var daStage:String = PlayState.curStage;
 
-		if (!inEditor) {
+		if (!inEditor && noteData != -1) {
 			if (isSustainNote && !prevNote.isSustainNote) {
 				sustainParent = prevNote;
 				prevNote.sustainChildren.push(this);
@@ -114,7 +116,7 @@ class Note extends FlxSprite
 				updateHitbox();
 
 			default:
-				frames = Paths.getSparrowAtlas('NOTE_assets');
+				frames = Paths.getSparrowAtlas('NOTE_assets', 'shared');
 
 				animation.addByPrefix('greenScroll', 'green0');
 				animation.addByPrefix('redScroll', 'red0');

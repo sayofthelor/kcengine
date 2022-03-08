@@ -1,5 +1,7 @@
 package;
 
+import sys.io.File;
+import sys.FileSystem;
 import Conductor.BPMChangeEvent;
 import Section.SwagSection;
 import Song.SwagSong;
@@ -102,6 +104,17 @@ class ChartingState extends MusicBeatState
 		leftIcon.setPosition(0, -100);
 		rightIcon.setPosition(gridBG.width / 2, -100);
 
+		
+		var eventTextIcon:FlxText = new FlxText(gridBG.x, -46, 0, "E", 32);
+		eventTextIcon.color = 0xffE0FFFF;
+		eventTextIcon.font = Paths.font('vcr.ttf');
+		eventTextIcon.scrollFactor.set(1, 1);
+		add(eventTextIcon);
+
+		var eventLine:FlxSprite = new FlxSprite(gridBG.x + GRID_SIZE, 0).makeGraphic(2, Std.int(gridBG.height), FlxColor.BLACK);
+
+		add(eventLine);
+
 		var gridBlackLine:FlxSprite = new FlxSprite(gridBG.x + gridBG.width - (GRID_SIZE * 4)).makeGraphic(2, Std.int(gridBG.height), FlxColor.BLACK);
 		//var gridBlackLine:FlxSprite = new FlxSprite(gridBG.x + gridBG.width / 2).makeGraphic(2, Std.int(gridBG.height), FlxColor.BLACK);
 		add(gridBlackLine);
@@ -114,7 +127,7 @@ class ChartingState extends MusicBeatState
 		else
 		{
 			_song = {
-				song: 'Test',
+				song: 'Blammed',
 				notes: [],
 				bpm: 150,
 				needsVoices: true,
@@ -140,7 +153,7 @@ class ChartingState extends MusicBeatState
 		Conductor.changeBPM(_song.bpm);
 		Conductor.mapBPMChanges(_song);
 
-		bpmTxt = new FlxText(1000, 50, 0, "", 16);
+		bpmTxt = new FlxText(FlxG.width / 2 + 80, 420, 0, "", 16);
 		bpmTxt.scrollFactor.set();
 		add(bpmTxt);
 
@@ -151,9 +164,10 @@ class ChartingState extends MusicBeatState
 		add(dummyArrow);
 
 		var tabs = [
+			{name: 'Events', label: 'Events'},
 			{name: "Song", label: 'Song'},
 			{name: "Section", label: 'Section'},
-			{name: "Note", label: 'Note'}
+			{name: "Note", label: 'Note'},
 		];
 
 		UI_box = new FlxUITabMenu(null, tabs, true);
@@ -161,11 +175,13 @@ class ChartingState extends MusicBeatState
 		UI_box.resize(300, 400);
 		UI_box.x = FlxG.width / 2;
 		UI_box.y = 20;
+		UI_box.x += 80;
 		add(UI_box);
 
 		addSongUI();
 		addSectionUI();
 		addNoteUI();
+		addEventsUI();
 
 		add(curRenderedNotes);
 		add(curRenderedSustains);
@@ -324,6 +340,51 @@ class ChartingState extends MusicBeatState
 	}
 
 	var stepperSusLength:FlxUINumericStepper;
+
+	public var eventDataArray:Array<String> = ['Hey', 'ChangeBF', 'ChangeGF', 'ChangeOpponent'];
+
+	public var eventDisplayArray:Array<String> = ['Hey!', 'Change BF', 'Change GF', 'Change Opponent'];
+
+	public var curEvent:String = '';
+
+	var eventDropdown:FlxUIDropDownMenu;
+	var displayThingy1:FlxText;
+	var displayThingy2:FlxText;
+	var eventValue1:FlxInputText;
+	var eventValue2:FlxInputText;
+
+	function addEventsUI() {
+		var tab_group_event = new FlxUI(null, UI_box);
+		tab_group_event.name = 'Events';
+
+		eventDropdown = new FlxUIDropDownMenu(10, 10, FlxUIDropDownMenu.makeStrIdLabelArray(eventDisplayArray, true), function(str:String) {
+			curEvent = eventDataArray[Std.parseInt(str)];
+		});
+		
+		displayThingy1 = new FlxText(10, 40, 0, 'Value 1', 16);
+		displayThingy2 = new FlxText(10, 80, 0, 'Value 1', 16);
+
+		eventValue1 = new FlxInputText(100, 40, 150, '', 16);
+		eventValue2 = new FlxInputText(100, 80, 150, '', 16);
+
+		tab_group_event.add(eventValue1);
+		tab_group_event.add(eventValue2);
+		tab_group_event.add(displayThingy1);
+		tab_group_event.add(displayThingy2);
+		tab_group_event.add(eventDropdown);
+		
+		UI_box.addGroup(tab_group_event);
+	}
+
+	function manageEventUI () {
+		if (eventDropdown.list[0].visible) {
+			eventValue1.active = false;
+			eventValue2.active = false;
+		} else {
+			eventValue1.active = true;
+			eventValue1.active = true;
+		}
+	}
 
 	function addNoteUI():Void
 	{
@@ -607,6 +668,10 @@ class ChartingState extends MusicBeatState
 				vocals.time = FlxG.sound.music.time;
 			}
 
+			if (FlxG.keys.pressed.CONTROL && FlxG.keys.justPressed.S) {
+				saveLevel();
+			}
+
 			if (!FlxG.keys.pressed.SHIFT)
 			{
 				if (FlxG.keys.pressed.W || FlxG.keys.pressed.S)
@@ -668,6 +733,8 @@ class ChartingState extends MusicBeatState
 			+ "\nSection: "
 			+ curSection;
 		super.update(elapsed);
+
+		manageEventUI();
 	}
 
 	function changeNoteSustain(value:Float):Void
@@ -864,7 +931,7 @@ class ChartingState extends MusicBeatState
 			note.sustainLength = daSus;
 			note.setGraphicSize(GRID_SIZE, GRID_SIZE);
 			note.updateHitbox();
-			note.x = Math.floor(daNoteInfo * GRID_SIZE);
+			note.x = Math.floor(daNoteInfo * GRID_SIZE) + GRID_SIZE;
 			note.y = Math.floor(getYfromStrum((daStrumTime - sectionStartTime()) % (Conductor.stepCrochet * _song.notes[curSection].lengthInSteps)));
 
 			curRenderedNotes.add(note);
@@ -942,29 +1009,37 @@ class ChartingState extends MusicBeatState
 		updateGrid();
 	}
 
-	private function addNote(isEvent:Bool = false):Void
+	private function addNote():Void
 	{
 		var noteStrum = getStrumTime(dummyArrow.y) + sectionStartTime();
-		var noteData = Math.floor(FlxG.mouse.x / GRID_SIZE);
+		var noteData = Math.floor(FlxG.mouse.x / GRID_SIZE) - 1;
 		var noteSus = 0;
 
-		var eventType:String = "";
+		trace(noteData);
 
-		_song.notes[curSection].sectionNotes.push([noteStrum, noteData, noteSus, isEvent, eventType]);
+		var ev:String = "";
+		var evParam1:Dynamic = 0;
+		var evParam2:Dynamic = 0;
+
+		if (noteData != -1) {
+		_song.notes[curSection].sectionNotes.push([noteStrum, noteData, noteSus]);
+		} else {
+			_song.events.push([noteStrum, ev, evParam1, evParam2]);
+		}
 
 		curSelectedNote = _song.notes[curSection].sectionNotes[_song.notes[curSection].sectionNotes.length - 1];
 
 		if (FlxG.keys.pressed.CONTROL)
 		{
-			_song.notes[curSection].sectionNotes.push([noteStrum, (noteData + 4) % 8, noteSus, true, isEvent]);
+			if (noteData != -1) {
+			_song.notes[curSection].sectionNotes.push([noteStrum, (noteData + 4) % 8, noteSus, true]);
+			} else {
+				_song.events.push([noteStrum, ev, evParam1, evParam2]);
+			}
 		}
 
 		trace(noteStrum);
 		trace(curSection);
-
-		if (isEvent) {
-
-		}
 
 		updateGrid();
 		updateNoteUI();
@@ -1042,6 +1117,11 @@ class ChartingState extends MusicBeatState
 			"song": _song
 		});
 		FlxG.save.flush();
+		#if sys
+		if (FileSystem.exists(Paths.json(_song.song, 'preload'))) {
+			File.saveContent(Paths.json(_song.song, 'preload'), Json.stringify({"song": _song}));
+		}
+		#end
 	}
 
 	private function saveLevel()

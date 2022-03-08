@@ -25,6 +25,8 @@ class MusicBeatState extends FlxUIState
 
 	public var colorBlindnessEffect:ColorBlindEffect;
 
+	public static var playerSettingsInnitted:Bool = false;
+
 	inline function get_controls():Controls {
 		if (Prefs.keyboardScheme == KeyboardScheme.DFJK)
 		PlayerSettings.player1.controls.setKeyboardScheme(DFJK);
@@ -39,6 +41,11 @@ class MusicBeatState extends FlxUIState
 			Prefs.testing();
 			Prefs.init();
 			trace('initted player prefs');
+		}
+
+		if (!playerSettingsInnitted) {
+			PlayerSettings.init();
+			playerSettingsInnitted = true;
 		}
 
 		if (CharacterManager.colorMap == null) {

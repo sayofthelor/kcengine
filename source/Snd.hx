@@ -1,4 +1,6 @@
+#if USE_FAXE
 import faxe.Faxe;
+
 
 import SndTV;
 using StringTools;
@@ -617,7 +619,6 @@ class SoundEvent extends Sound{
 		return chan;
 	}
 }
-
 class Snd {
 	public static var EMPTY_STRING = "";
 	public static var 	PLAYING 		: hxd.Stack<Snd> 	= new hxd.Stack();
@@ -1286,3 +1287,4 @@ class Snd {
 		return cast fbank;
 	}
 }
+#end
