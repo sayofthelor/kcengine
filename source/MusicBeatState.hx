@@ -47,10 +47,6 @@ class MusicBeatState extends FlxUIState
 			PlayerSettings.init();
 			playerSettingsInnitted = true;
 		}
-
-		if (CharacterManager.colorMap == null) {
-			CharacterManager.getColors();
-		}
 		super();
 	}
 
