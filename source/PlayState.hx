@@ -65,7 +65,7 @@ class PlayState extends MusicBeatState
 
 	public var notes:FlxTypedGroup<Note>;
 	public var unspawnNotes:Array<Note> = [];
-	public var eventNotes:Array<EventNote> = [];
+	public var eventNotes:Array<FunkinEvent> = [];
 
 	public var strumLine:FlxSprite;
 	public var curSection:Int = 0;
@@ -220,7 +220,17 @@ class PlayState extends MusicBeatState
 
 		iconRPC = SONG.player2;
 
-		eventNotes = cast SONG.events;
+		if (SONG.events != null && SONG.events.length > 0) {
+		for (i in SONG.events) {
+			trace(i);
+			if (i != null) {
+			eventNotes.push(new FunkinEvent(i[0], i[1], i[2]));
+			}
+		}
+		} else {
+			trace("No events found!");
+		}
+		trace(eventNotes);
 
 		// To avoid having duplicate images in Discord assets
 		switch (iconRPC)
@@ -873,7 +883,6 @@ class PlayState extends MusicBeatState
 					startCountdown();
 			}
 		}
-
 		super.create();
 
 		updateTime = true;
@@ -984,7 +993,8 @@ class PlayState extends MusicBeatState
 		{
 			dad.dance();
 			gf.dance();
-			boyfriend.playAnim('idle');
+			if (!boyfriend.suspendOtherAnims)
+				boyfriend.playAnim('idle');
 
 			var introAssets:Map<String, Array<String>> = new Map<String, Array<String>>();
 			introAssets.set('default', ['ready', "set", "go"]);
@@ -1707,6 +1717,9 @@ class PlayState extends MusicBeatState
 				}
 				else
 				{
+					if (daNote.isEvent) {
+						daNote.visible = false;
+					}
 					daNote.visible = true;
 					daNote.active = true;
 				}
@@ -1881,6 +1894,8 @@ class PlayState extends MusicBeatState
 				}}
 			});
 		}
+
+		checkFunkinEvents();
 
 		if (!inCutscene)
 			keyShit();
@@ -2278,6 +2293,8 @@ class PlayState extends MusicBeatState
 						case 3:
 							if (right)
 								goodNoteHit(daNote);
+						case -1:
+							// do nothing lmfao
 					}
 				}
 			});
@@ -2393,6 +2410,7 @@ class PlayState extends MusicBeatState
 				noteMiss(2);
 			if (rightP)
 				noteMiss(3);
+		
 		}
 	
 	
@@ -2412,43 +2430,24 @@ class PlayState extends MusicBeatState
 		}
 	}
 
-	function checkEventNote() {
+	function checkFunkinEvents() {
 		while (eventNotes.length > 0) {
 
-			var evNote:EventNote = eventNotes[0];
-
-			if (Conductor.songPosition < evNote.strumTime)
+			if (Conductor.songPosition < eventNotes[0].strumTime)
 				break;
 
-			performEventNote(evNote.event, evNote.values);
+			performEventNote(eventNotes[0]);
 
 			eventNotes.shift();
 		}
 	}
 
-	function performEventNote(name:NoteEvent, values:Array<Dynamic>) {
-		switch (name) {
-			case Hey:
-				boyfriend.playAnim('hey');
-			case ChangeBF:
-				var x = boyfriend.x;
-				var y = boyfriend.y;
-				remove(boyfriend);
-				boyfriend = new Boyfriend(x, y, values[0]);
-				add(boyfriend);
-			case ChangeGF:
-				var x = gf.x;
-				var y = gf.y;
-				remove(gf);
-				gf = new Character(x, y, values[0]);
-				add(gf);
-			case ChangeOpponent:
-				var x = dad.x;
-				var y = dad.y;
-				remove(dad);
-				dad = new Character(x, y, values[0]);
-				add(dad);
-			default:
+	function performEventNote(eventNote:FunkinEvent) {
+		trace(eventNote.strumTime - Conductor.songPosition);
+		switch (eventNote.event.toLowerCase()) {
+			case 'hey':
+				boyfriend.playAnim('hey', true);
+				boyfriend.heyTimer = 0.6;
 		}
 	}
 
@@ -2665,7 +2664,7 @@ class PlayState extends MusicBeatState
 			gf.dance();
 		}
 
-		if (!boyfriend.animation.curAnim.name.startsWith("sing"))
+		if (!boyfriend.animation.curAnim.name.startsWith("sing") && !boyfriend.suspendOtherAnims)
 		{
 			boyfriend.playAnim('idle');
 		}

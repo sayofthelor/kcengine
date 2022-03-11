@@ -383,15 +383,15 @@ class TitleState extends MusicBeatState
 
 	var skippedIntro:Bool = false;
 
-	function skipIntro():Void
+function skipIntro():Void
+{
+	if (!skippedIntro)
 	{
-		if (!skippedIntro)
-		{
-			remove(ngSpr);
+		remove(ngSpr);
 
-			FlxG.camera.flash(FlxColor.WHITE, 4);
-			remove(credGroup);
-			skippedIntro = true;
-		}
+		FlxG.camera.flash(FlxColor.WHITE, 4);
+		remove(credGroup);
+		skippedIntro = true;
+	}
 	}
 }

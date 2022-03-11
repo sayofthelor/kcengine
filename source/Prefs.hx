@@ -19,11 +19,16 @@ class Prefs {
     }
 
     public static function save() {
+
+        trace("saving" + downscroll, ghostTapping, noteSplashes, keyboardScheme, showTimeBar);
+
         FlxG.save.data.downscroll = downscroll;
         FlxG.save.data.ghostTapping = ghostTapping;
         FlxG.save.data.noteSplashes = noteSplashes;
         FlxG.save.data.keyboardScheme = keyboardScheme;
         FlxG.save.data.showTimeBar = showTimeBar;
+
+        trace("result " + FlxG.save.data.downscroll, FlxG.save.data.ghostTapping, FlxG.save.data.noteSplashing, FlxG.save.data.keyboardScheme, FlxG.save.data.showTimeBar);
     }
 
     public static function testing() {

@@ -73,6 +73,9 @@ class Note extends FlxSprite
 		y -= 2000;
 		this.strumTime = strumTime;
 
+		this.eventName = eventType;
+		this.eventValues = eventParams;
+		
 		this.noteData = noteData;
 		
 		var daStage:String = PlayState.curStage;
@@ -86,7 +89,6 @@ class Note extends FlxSprite
 				sustainParent.sustainChildren.push(this);
 			}
 		}
-
 		switch (daStage)
 		{
 			case 'school' | 'schoolEvil':
@@ -136,7 +138,8 @@ class Note extends FlxSprite
 				setGraphicSize(Std.int(width * 0.7));
 				updateHitbox();
 				antialiasing = true;
-		}
+		
+	}
 
 		switch (noteData)
 		{
@@ -219,7 +222,7 @@ class Note extends FlxSprite
 			if (strumTime < Conductor.songPosition - Conductor.safeZoneOffset && !wasGoodHit)
 				tooLate = true;
 		}
-		else
+		else if (!mustPress)
 		{
 			canBeHit = false;
 

@@ -11,23 +11,6 @@ import flixel.animation.FlxBaseAnimation;
 import flixel.graphics.frames.FlxAtlasFrames;
 
 using StringTools;
-
-class CharacterManager {
-
-	public static var colorMap:StringMap<Int>;
-
-	public static function getColors() {
-
-		colorMap = new StringMap<Int>();
-
-		var stuff = Assets.getText(Paths.txt('colors', 'preload')).split('\n');
-
-		for (i in stuff) {
-			colorMap.set(i.split(':')[0], Std.parseInt('0xFF' + i.split(':')[1]));	
-		}
-		
-	}
-}
 class Character extends FlxSprite
 {
 	public var animOffsets:Map<String, Array<Dynamic>>;
@@ -86,16 +69,6 @@ class Character extends FlxSprite
 	public function new(x:Float, y:Float, ?character:String = "bf", ?isPlayer:Bool = false)
 	{
 		super(x, y);
-
-		if (CharacterManager.colorMap.get(character) != null) {
-			healthbarColor = CharacterManager.colorMap.get(character);
-		} else {
-			if (isPlayer) {
-				healthbarColor = 0xFF31B0D1;
-			} else {
-				healthbarColor = 0xFFFF0000;
-			}
-		}
 
 		animOffsets = new Map<String, Array<Dynamic>>();
 		curCharacter = character;
@@ -639,17 +612,30 @@ class Character extends FlxSprite
 		}
 
 		super.update(elapsed);
+
+		if (heyTimer <= 0) {
+			suspendOtherAnims = false;
+		} else {
+			heyTimer -= elapsed;
+			suspendOtherAnims = true;
+		}
 	}
 
 	private var danced:Bool = false;
 
+	public var heyTimer:Float = 0;
+
+	public var suspendOtherAnims:Bool = false;
+
 	/**
 	 * FOR GF DANCING SHIT
 	 */
+
 	public function dance()
 	{
 		if (!debugMode)
 		{
+
 			switch (curCharacter)
 			{
 				case 'gf':
@@ -702,7 +688,9 @@ class Character extends FlxSprite
 						playAnim('danceRight');
 					else
 						playAnim('danceLeft');
+				case 'bf' | 'bf-christmas' | 'bf-pixel':
 				default:
+					if (animation.curAnim.name == 'hey' && animation.curAnim.finished || animation.curAnim.name != 'hey')
 					playAnim('idle');
 			}
 		}

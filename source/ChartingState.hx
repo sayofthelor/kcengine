@@ -1,5 +1,6 @@
 package;
 
+import FunkinEvent.FunkinEventGraphic;
 import sys.io.File;
 import sys.FileSystem;
 import Conductor.BPMChangeEvent;
@@ -65,6 +66,7 @@ class ChartingState extends MusicBeatState
 
 	var curRenderedNotes:FlxTypedGroup<Note>;
 	var curRenderedSustains:FlxTypedGroup<FlxSprite>;
+	var curRenderedEvents:FlxTypedGroup<FunkinEventGraphic>;
 
 	var gridBG:FlxSprite;
 
@@ -82,6 +84,11 @@ class ChartingState extends MusicBeatState
 
 	var leftIcon:HealthIcon;
 	var rightIcon:HealthIcon;
+
+	public function new() {
+		super();
+
+	}
 
 	override function create()
 	{
@@ -121,6 +128,7 @@ class ChartingState extends MusicBeatState
 
 		curRenderedNotes = new FlxTypedGroup<Note>();
 		curRenderedSustains = new FlxTypedGroup<FlxSprite>();
+		curRenderedEvents = new FlxTypedGroup<FunkinEventGraphic>();
 
 		if (PlayState.SONG != null)
 			_song = PlayState.SONG;
@@ -129,6 +137,7 @@ class ChartingState extends MusicBeatState
 			_song = {
 				song: 'Blammed',
 				notes: [],
+				events: [],
 				bpm: 150,
 				needsVoices: true,
 				player1: 'bf',
@@ -136,6 +145,10 @@ class ChartingState extends MusicBeatState
 				speed: 1,
 				validScore: false
 			};
+		}
+
+		if (_song.events == null) {
+			_song.events = [];
 		}
 
 		FlxG.mouse.visible = true;
@@ -887,7 +900,12 @@ class ChartingState extends MusicBeatState
 			curRenderedSustains.remove(curRenderedSustains.members[0], true);
 		}
 
+		while (curRenderedEvents.members.length > 0) {
+			curRenderedEvents.remove(curRenderedEvents.members[0], true);
+		}
+
 		var sectionInfo:Array<Dynamic> = _song.notes[curSection].sectionNotes;
+		var eventSectionInfo:Array<Dynamic> = _song.events;
 
 		if (_song.notes[curSection].changeBPM && _song.notes[curSection].bpm > 0)
 		{
@@ -923,8 +941,6 @@ class ChartingState extends MusicBeatState
 			var daNoteInfo = i[1];
 			var daStrumTime = i[0];
 			var daSus = i[2];
-			var isEvent = i[3];
-			var eventType = i[4];
 			var isSustain = daSus > 0;
 
 			var note:Note = new Note(daStrumTime, daNoteInfo % 4, isSustain, true/*, isEvent, eventType*/);
@@ -942,6 +958,21 @@ class ChartingState extends MusicBeatState
 					note.y + GRID_SIZE).makeGraphic(8, Math.floor(FlxMath.remapToRange(daSus, 0, Conductor.stepCrochet * 16, 0, gridBG.height)));
 				curRenderedSustains.add(sustainVis);
 			}
+		}
+
+		for (i in eventSectionInfo) {
+			var daStrumTime = i[0];
+
+			trace(i[0]);
+
+			var note:Note = new Note(daStrumTime, -1 % 4, false, true/*, isEvent, eventType*/);
+			note.sustainLength =0;
+			note.setGraphicSize(GRID_SIZE, GRID_SIZE);
+			note.updateHitbox();
+			note.x = Math.floor(-1 * GRID_SIZE) + GRID_SIZE;// - GRID_SIZE;
+			note.y = Math.floor(getYfromStrum((daStrumTime - sectionStartTime()) % (Conductor.stepCrochet * _song.notes[curSection].lengthInSteps)));
+
+			curRenderedNotes.add(note);
 		}
 	}
 
@@ -977,15 +1008,66 @@ class ChartingState extends MusicBeatState
 		updateGrid();
 		updateNoteUI();
 	}
+	var curSelectedEvent:Array<Dynamic>;
+	var modifyingEvent:Bool = false;
 
-	function deleteNote(note:Note):Void
+	function selectEvent(note:Note) {
+			for (e in _song.events) {
+				if (note.strumTime == e[0]) {
+					curSelectedEvent = e;
+					modifyingEvent = true;
+					return true;
+				}
+			}
+
+			return false;
+		
+	}
+
+	var gotTheNote:Bool = false;
+
+	function deleteNote(note:Note, ?funkinEvent:Array<Dynamic>):Void
 	{
+		if (note != null) {
 		for (i in _song.notes[curSection].sectionNotes)
 		{
 			if (i[0] == note.strumTime && i[1] % 4 == note.noteData)
 			{
 				FlxG.log.add('FOUND EVIL NUMBER');
 				_song.notes[curSection].sectionNotes.remove(i);
+			}
+		}
+
+		for (i in _song.events) {
+			if (note.strumTime == i[0]) {
+				_song.events.remove(i);
+			}
+		}
+	
+	}
+
+	for (i in curRenderedNotes.members) {
+		for (e in _song.events) {
+			if (i.strumTime == e[0]) {
+				curRenderedNotes.remove(i, true);
+				_song.events.remove(e);
+				trace('removed that SHIT');
+				FlxG.log.add('removed event!');
+			}
+		}
+	}
+
+		updateGrid();
+
+	}
+
+	function deleteEvent(event:FunkinEventGraphic) {
+		for (i in _song.events) {
+				if (i[0] == event.funkinEvent.strumTime) {
+					curRenderedEvents.remove(event, true);
+					_song.events.remove(i);
+					trace('removed Event');
+				
 			}
 		}
 
@@ -1015,16 +1097,15 @@ class ChartingState extends MusicBeatState
 		var noteData = Math.floor(FlxG.mouse.x / GRID_SIZE) - 1;
 		var noteSus = 0;
 
+		var eventName = "hey";
+		var eventParams:Array<Dynamic> = [eventValue1.text, eventValue2.text];
+
 		trace(noteData);
-
-		var ev:String = "";
-		var evParam1:Dynamic = 0;
-		var evParam2:Dynamic = 0;
-
 		if (noteData != -1) {
 		_song.notes[curSection].sectionNotes.push([noteStrum, noteData, noteSus]);
 		} else {
-			_song.events.push([noteStrum, ev, evParam1, evParam2]);
+			_song.events.push([noteStrum, curEvent, eventParams]);
+			trace('event!');
 		}
 
 		curSelectedNote = _song.notes[curSection].sectionNotes[_song.notes[curSection].sectionNotes.length - 1];
@@ -1034,7 +1115,8 @@ class ChartingState extends MusicBeatState
 			if (noteData != -1) {
 			_song.notes[curSection].sectionNotes.push([noteStrum, (noteData + 4) % 8, noteSus, true]);
 			} else {
-				_song.events.push([noteStrum, ev, evParam1, evParam2]);
+				trace('event!');
+				_song.events.push([noteStrum, curEvent, eventParams]);
 			}
 		}
 
