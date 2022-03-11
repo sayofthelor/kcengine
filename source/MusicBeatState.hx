@@ -1,7 +1,6 @@
 package;
 
 import Controls.KeyboardScheme;
-import Character.CharacterManager;
 import openfl.filters.ShaderFilter;
 import ColorBlindEffect.ColorBlindnessType;
 import Conductor.BPMChangeEvent;
