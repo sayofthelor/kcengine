@@ -33,7 +33,16 @@ class Character extends FlxSprite
 		var offsets = fileData.offsets;
 
 		frames = Paths.getSparrowAtlas(main.animFile);
+		if (main.color != null) {
 		healthbarColor = Std.parseInt(main.color);
+		} else {
+			if (isPlayer) {
+				healthbarColor = 0xff31B0D1;
+			} else {
+				healthbarColor = 0xffFF0000;
+			}
+		}
+		
 		antialiasing = main.antialiasing;
 
 		
@@ -86,6 +95,11 @@ class Character extends FlxSprite
 
 			trace('done!');
 		} else {
+			if (isPlayer) {
+				healthbarColor = 0xff31B0D1;
+			} else {
+				healthbarColor = 0xffFF0000;
+			}
 		switch (curCharacter)
 		{
 			case 'gf':

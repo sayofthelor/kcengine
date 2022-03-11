@@ -90,6 +90,7 @@ class PlayState extends MusicBeatState
 
 	public var timeBarBG:FlxSprite;
 	public var timeBar:FlxBar;
+	public var timeTxt:FlxText;
 
 	public var noteSplashGroup:FlxTypedGroup<NoteSplash>;
 
@@ -124,7 +125,6 @@ class PlayState extends MusicBeatState
 	var talking:Bool = true;
 	var songScore:Int = 0;
 	var scoreTxt:FlxText;
-	var timeTxt:FlxText;
 
 	public static var campaignScore:Int = 0;
 
@@ -765,12 +765,12 @@ class PlayState extends MusicBeatState
 		timeBar.createFilledBar(FlxColor.WHITE, FlxColor.BLACK);
 		add(timeBar);
 
-		if (Prefs.showTimeBar) {
-		timeTxt = new FlxText(timeBarBG.x + timeBarBG.width / 2, timeBarBG.y - timeBarBG.height, 0, "", 32);
+		timeTxt = new FlxText(timeBarBG.x + timeBarBG.width / 2, timeBarBG.y - timeBarBG.height / 2, 0, "", 32);
 		timeTxt.setFormat(Paths.font('vcr.ttf'), 32, FlxColor.WHITE, FlxTextAlign.CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		timeTxt.scrollFactor.set();
 		timeTxt.borderSize = 2;
-		}
+		timeTxt.x -= timeTxt.width;
+		add(timeTxt);
 
 	}
 
@@ -818,6 +818,7 @@ class PlayState extends MusicBeatState
 		notes.cameras = [camHUD];
 		timeBar.cameras = [camHUD];
 		timeBarBG.cameras = [camHUD];
+		timeTxt.cameras = [camHUD];
 		healthBar.cameras = [camHUD];
 		healthBarBG.cameras = [camHUD];
 		iconP1.cameras = [camHUD];
@@ -1444,12 +1445,13 @@ class PlayState extends MusicBeatState
 			var curTime:Float = Conductor.songPosition;
 			if(curTime < 0) curTime = 0;
 			songPercent = (curTime / songLength);
-			//trace(songPercent);
-			var songCalc = Math.floor(FlxG.sound.music.length - curTime);
 
-			var totalSeconds:Int = Math.floor(songCalc / 1000);
+			var songCalc:Float = (songLength - curTime);
 
-			timeTxt.text = FlxStringUtil.formatTime(totalSeconds, false);
+			var secondsTotal:Int = Math.floor(songCalc / 1000);
+			if(secondsTotal < 0) secondsTotal = 0;
+
+			timeTxt.text = FlxStringUtil.formatTime(secondsTotal, false);
 		}
 	}
 
