@@ -2,7 +2,31 @@
 
 name inspired by my youtube handle lmao
 
-has stuff idk im too lazy for readme shit
+got da
+
+* downscroll
+* multiple keybind presets (the famous DFJK too!!)
+* ghost tapping
+* time bar
+* funky note splashes
+* events (which you can add in charting!)
+* soft coded weeks & characters (and their healthbar colors!)
+
+in da works:
+* better dialogue system
+* softcoded title screen text
+* more events than bf's "hey!"
+* better charting (copy/paste section, etc)
+
+to be added:
+* change settings from using `FlxG.save` to using json
+* stage editor
+* hscript modding support
+* plugin support
+
+# credits
+
+shadow mario & kade dev - without their engines i wouldve never been able to code some of the features
 
 # Friday Night Funkin
 
