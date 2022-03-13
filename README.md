@@ -19,6 +19,7 @@ in da works:
 * better charting (copy/paste section, etc)
 
 to be added:
+* note skins
 * change settings from using `FlxG.save` to using json
 * stage editor
 * hscript modding support
