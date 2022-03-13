@@ -2,9 +2,6 @@ package;
 
 import openfl.geom.ColorTransform;
 import Controls.KeyboardScheme;
-import Option.Option;
-import Option.BoolOption;
-import Option.ArrayOption;
 import Controls.Control;
 import flash.text.TextField;
 import flixel.FlxG;
@@ -16,13 +13,10 @@ import flixel.math.FlxMath;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import lime.utils.Assets;
+
+//todo: json this shit ig
 class OptionsMenu extends MusicBeatState
 {
-
-	var boolOptions:Array<BoolOption>;
-	var arrayOptions:Array<ArrayOption<Array<String>>>;
-
-	var keybindOptions:ArrayOption<KeyboardScheme>;
 
 	var optionThingy:FlxTypedGroup<FlxText>;
 	var daIndex:Int;
@@ -51,7 +45,8 @@ class OptionsMenu extends MusicBeatState
 			["Ghost Tapping", "Toggle if hitting keys while no note\n is on the arrows count as a miss", Prefs.ghostTapping, "b"],
 			["Note Splashes", "Toggle if there should be a notesplash effect\nwhen you hit a SICK", Prefs.noteSplashes, "b"],
 			["Show Time Bar", "Toggle if there should be a timebar\nshowing the amount of time left in a song", Prefs.showTimeBar, "b"],
-			["Change Keybinds", "Toggle between keybind presets such as DFJK\nor Solo(WASD+ArrowKeys)", Prefs.keyboardScheme, "a"]
+			["Change Keybinds", "Toggle between keybind presets such as DFJK\nor Solo(WASD+ArrowKeys)", Prefs.keyboardScheme, "a"],
+			["Botplay", "Toggle if a bot should play as the player", Prefs.botplay, "b"]
 		];
 
 		optionDisplayShit = [
@@ -59,7 +54,8 @@ class OptionsMenu extends MusicBeatState
 			"Ghost Tapping ",
 			"Note Splashes ",
 			"Time Bar ",
-			"Keybind: "
+			"Keybind: ",
+			"Botplay "
 		];
 
 		generateUI();
@@ -179,8 +175,7 @@ class OptionsMenu extends MusicBeatState
 		Prefs.noteSplashes = optionShit[2][2];
 		Prefs.showTimeBar = optionShit[3][2];
 		Prefs.keyboardScheme = optionShit[4][2];
-
-		trace(Prefs.downscroll == optionShit[0][2]);
+		Prefs.botplay = optionShit[5][2];
 
 		Prefs.save();
 	}

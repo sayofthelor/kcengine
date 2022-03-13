@@ -8,6 +8,7 @@ class Prefs {
     public static var noteSplashes:Bool;
     public static var keyboardScheme:KeyboardScheme;
     public static var showTimeBar:Bool;
+    public static var botplay:Bool;
 
     public static function init() {
 
@@ -16,19 +17,21 @@ class Prefs {
         noteSplashes = FlxG.save.data.noteSplashes;
         keyboardScheme = FlxG.save.data.keyboardScheme;
         showTimeBar = FlxG.save.data.showTimeBar;
+        botplay = FlxG.save.data.botplay;
     }
 
     public static function save() {
 
-        trace("saving" + downscroll, ghostTapping, noteSplashes, keyboardScheme, showTimeBar);
+        trace("saving");
 
         FlxG.save.data.downscroll = downscroll;
         FlxG.save.data.ghostTapping = ghostTapping;
         FlxG.save.data.noteSplashes = noteSplashes;
         FlxG.save.data.keyboardScheme = keyboardScheme;
         FlxG.save.data.showTimeBar = showTimeBar;
+        FlxG.save.data.botplay = botplay;
 
-        trace("result " + FlxG.save.data.downscroll, FlxG.save.data.ghostTapping, FlxG.save.data.noteSplashing, FlxG.save.data.keyboardScheme, FlxG.save.data.showTimeBar);
+        trace("saved");
     }
 
     public static function testing() {
@@ -37,5 +40,6 @@ class Prefs {
         FlxG.save.data.noteSplashes = true;
         FlxG.save.data.keyboardScheme = Solo;
         FlxG.save.data.showTimeBar = true;
+        FlxG.save.data.botplay = false;
     }
 }
