@@ -118,7 +118,9 @@
 	<haxelib name="polymod"/>
 	<haxelib name="discord_rpc" if="desktop"/>
 	<haxelib name="hscript-plus"/>
-	
+	<haxelib name="extension-webm"/> <!-- haxelib git extension-webm https://github.com/jobf/extension-webm.git -->
+	<haxelib name="djFlixel"/>
+
 	<!-- <haxelib name="hxcpp-debug-server" if="desktop"/> -->
 
 	<!-- <haxelib name="markdown" /> -->

@@ -21,58 +21,44 @@ import haxe.Json;
 
 using StringTools;
 
+typedef DialogueData = {
+	var name:String;
+	var text:String;
+	var typingSpeed:Float;
+	var anim:String;
+	var ?event:String;
+	var ?eventValues:Array<Dynamic>;
+	var ?spriteData:{x:Float,y:Float,angle:Float,alpha:Float}
+}
+
 class DialogueBoxPlus extends FlxTypedGroup<FlxSprite> {
 	public var x:Float = 0;
 	public var y:Float = 0;
 	public var angle:Float = 0;
 	public var alpha:Float = 1;
 
+	public var data:Array<DialogueData>;
+
+	public var previous(get, never):Int;
+	public var current:Int = 0;
+	public var next(get, never):Int;
+
 	public function new(file:String) {
 		super();
-	}
-}
-
-class PlusParser {
-
-	var state:ScriptState;
-
-	public function new(file:String, dialogueBox:DialogueBoxPlus) {
-		state = new ScriptState();
-		set('addCharacter', addCharacter);
-		set('removeCharacter', removeCharacter);
-		set('addDialogue', addDialogue);
-		set('addEvent', addEvent);
-		set('dialogueBox', dialogueBox);
+		data = parse(file);
 	}
 
-	public function exec(file:String) {
-		return state.executeString(Assets.getText(Paths.file('data/dialogue/$file.hx', TEXT, 'preload')));
+	public inline function parse(file:String) {
+		var path:String = Paths.json('dialogue/${PlayState.SONG.song}${PlayState.songEnded ? "-end": ""}');
+		return FileSystem.exists(path) ? Json.parse(Assets.getText(path)) : null;
 	}
 
-	private function addCharacter(name:String, fileName:String) {
-
+	function get_previous():Int {
+		return current - 1;
 	}
 
-	private function removeCharacter(name:String) {
-
-	}
-
-	private function addDialogue() {
-
-	}
-
-	private function addEvent() {
-
-	}
-
-	public inline function set(name:String, data:Dynamic) {
-		return state.variables.set(name, data);
-	}
-
-	public inline function get(name:String) {
-		if (state.variables.exists(name))
-			return state.variables.get(name);
-		return null;
+	function get_next():Int {
+		return current + 1;
 	}
 }
 

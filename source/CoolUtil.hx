@@ -1,5 +1,6 @@
 package;
 
+import flixel.input.keyboard.FlxKey;
 import lime.utils.Assets;
 
 using StringTools;
@@ -33,5 +34,9 @@ class CoolUtil
 			dumbArray.push(i);
 		}
 		return dumbArray;
+	}
+
+	public static inline function keyString(key:FlxKey) {
+		return key.toString().toLowerCase();
 	}
 }

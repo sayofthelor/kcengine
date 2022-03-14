@@ -29,7 +29,6 @@ import lime.app.Application;
 import openfl.Assets;
 
 using StringTools;
-
 class TitleState extends MusicBeatState
 {
 	static var initialized:Bool = false;
