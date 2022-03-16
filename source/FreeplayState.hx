@@ -1,5 +1,7 @@
 package;
 
+import haxe.Utf8;
+import haxe.Json;
 #if desktop
 import Discord.DiscordClient;
 #end
@@ -33,14 +35,21 @@ class FreeplayState extends MusicBeatState
 
 	private var iconArray:Array<HealthIcon> = [];
 
+	var freeplaySongs:Array<{songs:Array<String>, songCharacters:Array<String>, weekNum:Int, locked:Bool, isPixelWeek:Bool}> = [];
+
+	function getFreeplaySongs() {
+		freeplaySongs = cast Json.parse(Assets.getText(Paths.json('freeplay', 'preload'))).freeplay;
+
+		for (i in freeplaySongs) {
+			if (!i.locked)
+			addWeek(i.songs, i.weekNum, i.songCharacters);
+		}
+	}
+
 	override function create()
 	{
-		var initSonglist = CoolUtil.coolTextFile(Paths.txt('freeplaySonglist'));
 
-		for (i in 0...initSonglist.length)
-		{
-			songs.push(new SongMetadata(initSonglist[i], 1, 'gf'));
-		}
+		getFreeplaySongs();
 
 		/* 
 			if (FlxG.sound.music != null)
@@ -61,23 +70,23 @@ class FreeplayState extends MusicBeatState
 		isDebug = true;
 		#end
 
-		if (StoryMenuState.weekUnlocked[2] || isDebug)
-			addWeek(['Bopeebo', 'Fresh', 'Dadbattle'], 1, ['dad']);
+		// if (StoryMenuState.weekUnlocked[2] || isDebug)
+		// 	addWeek(['Bopeebo', 'Fresh', 'Dadbattle'], 1, ['dad']);
 
-		if (StoryMenuState.weekUnlocked[2] || isDebug)
-			addWeek(['Spookeez', 'South', 'Monster'], 2, ['spooky']);
+		// if (StoryMenuState.weekUnlocked[2] || isDebug)
+		// 	addWeek(['Spookeez', 'South', 'Monster'], 2, ['spooky']);
 
-		if (StoryMenuState.weekUnlocked[3] || isDebug)
-			addWeek(['Pico', 'Philly', 'Blammed'], 3, ['pico']);
+		// if (StoryMenuState.weekUnlocked[3] || isDebug)
+		// 	addWeek(['Pico', 'Philly', 'Blammed'], 3, ['pico']);
 
-		if (StoryMenuState.weekUnlocked[4] || isDebug)
-			addWeek(['Satin-Panties', 'High', 'Milf'], 4, ['mom']);
+		// if (StoryMenuState.weekUnlocked[4] || isDebug)
+		// 	addWeek(['Satin-Panties', 'High', 'Milf'], 4, ['mom']);
 
-		if (StoryMenuState.weekUnlocked[5] || isDebug)
-			addWeek(['Cocoa', 'Eggnog', 'Winter-Horrorland'], 5, ['parents-christmas', 'parents-christmas', 'monster-christmas']);
+		// if (StoryMenuState.weekUnlocked[5] || isDebug)
+		// 	addWeek(['Cocoa', 'Eggnog', 'Winter-Horrorland'], 5, ['parents-christmas', 'parents-christmas', 'monster-christmas']);
 
-		if (StoryMenuState.weekUnlocked[6] || isDebug)
-			addWeek(['Senpai', 'Roses', 'Thorns'], 6, ['senpai', 'senpai', 'spirit']);
+		// if (StoryMenuState.weekUnlocked[6] || isDebug)
+		// 	addWeek(['Senpai', 'Roses', 'Thorns'], 6, ['senpai', 'senpai', 'spirit']);
 
 		// LOAD MUSIC
 
@@ -196,6 +205,7 @@ class FreeplayState extends MusicBeatState
 		var downP = controls.DOWN_P;
 		var accepted = controls.ACCEPT;
 
+		if (!accepted) {
 		if (upP)
 		{
 			changeSelection(-1);
@@ -214,6 +224,14 @@ class FreeplayState extends MusicBeatState
 		{
 			FlxG.switchState(new MainMenuState());
 		}
+		
+		if (FlxG.keys.justPressed.H)
+			changeDiffNoSelection(2);
+		else if (FlxG.keys.justPressed.M)
+			changeDiffNoSelection(1);
+		else if (FlxG.keys.justPressed.E)
+			changeDiffNoSelection(0);
+	}
 
 		if (accepted)
 		{
@@ -229,6 +247,15 @@ class FreeplayState extends MusicBeatState
 			trace('CUR WEEK' + PlayState.storyWeek);
 			LoadingState.loadAndSwitchState(new PlayState());
 		}
+	}
+
+	function changeDiffNoSelection(leDiff:Int) {
+		curDifficulty = leDiff;
+		diffText.text = CoolUtil.difficultyArray[leDiff];
+
+		#if !switch
+		intendedScore = Highscore.getScore(songs[curSelected].songName, curDifficulty);
+		#end
 	}
 
 	function changeDiff(change:Int = 0)

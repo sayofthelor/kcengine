@@ -43,10 +43,10 @@ class TitleState extends MusicBeatState
 
 	var wackyImage:FlxSprite;
 
+	var muffinBind:Bool = false;
+
 	override public function create():Void
 	{
-
-		//Prefs.testing();
 
 		curWacky = FlxG.random.getObject(getIntroTextShit());
 
@@ -54,8 +54,10 @@ class TitleState extends MusicBeatState
 
 		super.create();
 
+		// if (muffinBind)
 		FlxG.save.bind('funkin', 'ninjamuffin99');
-
+		// else
+		// 	FlxG.save.bind('kcSaveData', 'kcengine');
 		Highscore.load();
 
 		if (FlxG.save.data.weekUnlocked != null)

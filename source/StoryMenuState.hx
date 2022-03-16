@@ -283,6 +283,13 @@ class StoryMenuState extends MusicBeatState
 					changeDifficulty(1);
 				if (controls.LEFT_P)
 					changeDifficulty(-1);
+
+				if (FlxG.keys.justPressed.H)
+					changeDifficultyNoSelection(2);
+				if (FlxG.keys.justPressed.N)
+					changeDifficultyNoSelection(1);
+				else if (FlxG.keys.justPressed.E)
+					changeDifficultyNoSelection(0);
 			}
 
 			if (controls.ACCEPT)
@@ -342,6 +349,39 @@ class StoryMenuState extends MusicBeatState
 				LoadingState.loadAndSwitchState(new PlayState(), true);
 			});
 		}
+	}
+
+	function changeDifficultyNoSelection(diffic:Int) {
+		curDifficulty = diffic;
+
+		sprDifficulty.offset.x = 0;
+
+		switch (curDifficulty)
+		{
+			case 0:
+				sprDifficulty.animation.play('easy');
+				sprDifficulty.offset.x = 20;
+			case 1:
+				sprDifficulty.animation.play('normal');
+				sprDifficulty.offset.x = 70;
+			case 2:
+				sprDifficulty.animation.play('hard');
+				sprDifficulty.offset.x = 20;
+		}
+
+		sprDifficulty.y = leftArrow.y - 15;
+
+		sprDifficulty.alpha = 0;
+
+		// USING THESE WEIRD VALUES SO THAT IT DOESNT FLOAT UP
+		sprDifficulty.y = leftArrow.y - 15;
+		intendedScore = Highscore.getWeekScore(curWeek, curDifficulty);
+
+		#if !switch
+		intendedScore = Highscore.getWeekScore(curWeek, curDifficulty);
+		#end
+
+		FlxTween.tween(sprDifficulty, {y: leftArrow.y + 15, alpha: 1}, 0.07);
 	}
 
 	function changeDifficulty(change:Int = 0):Void

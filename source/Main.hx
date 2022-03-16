@@ -1,5 +1,6 @@
 package;
 
+import djFlixel.D;
 import flixel.FlxGame;
 import flixel.FlxState;
 import openfl.Assets;
@@ -28,6 +29,8 @@ class Main extends Sprite
 	public function new()
 	{
 		super();
+
+		DJFlx.init();
 
 		if (stage != null)
 		{

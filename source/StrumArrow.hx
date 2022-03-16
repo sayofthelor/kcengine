@@ -3,6 +3,7 @@ package;
 import haxe.ds.IntMap;
 import flixel.FlxSprite;
 
+using StringTools;
 class StrumArrow extends FlxSprite {
     
     public var data:Int;
@@ -75,17 +76,37 @@ class StrumArrow extends FlxSprite {
 
     public override function update(elapsed:Float) {
         super.update(elapsed);
+
         if (holdTimer > 0) {
             holdTimer -= elapsed;
-            trace(holdTimer);
+            if (holdTimer <= 0) {
+                playAnim('static');
+                holdTimer = 0;
+            }
         }
 
-        if (holdTimer <= 0 && animation.curAnim.name != 'static') {
-            playAnim('static');
+    }
+
+    public function noteHit(note:Note) {
+        if (Prefs.botplay) {
+            var time:Float = 0.15;
+            if (note.isSustainNote && !note.animation.curAnim.name.endsWith('end')) {
+                time += 0.15;
+            }
+            holdTimer = time;
+
+            playAnim('confirm');
+        } else {
+            playAnim('confirm');
         }
     }
 
     public inline function playAnim(name:String, ?forced:Bool = true) {
         animation.play(name, true);
+
+        offset.set(frameWidth / 2, frameHeight / 2);
+
+		offset.x -= 54;
+		offset.y -= 56;
     }
 }

@@ -55,6 +55,8 @@ class Note extends FlxSprite
 	public static var BLUE_NOTE:Int = 1;
 	public static var RED_NOTE:Int = 3;
 
+	public var chartNoteChildren:Array<FlxSprite>;
+
 	public var isEvent:Bool = false;
 
 	public function new(strumTime:Float, noteData:Int, ?prevNote:Note, ?isSustainNote:Bool = false, ?inEditor:Bool = false, ?eventType:NoteEvent = None, ?eventParams:Array<Dynamic>)
@@ -159,7 +161,7 @@ class Note extends FlxSprite
 
 		// trace(prevNote);
 
-		if (isSustainNote && prevNote != null)
+		if (isSustainNote && prevNote != null && !inEditor)
 		{
 			noteScore * 0.2;
 			alpha = 0.6;
@@ -185,7 +187,7 @@ class Note extends FlxSprite
 			if (PlayState.curStage.startsWith('school'))
 				x += 30;
 
-			if (prevNote.isSustainNote)
+			if (prevNote.isSustainNote && !inEditor)
 			{
 				switch (prevNote.noteData)
 				{

@@ -104,6 +104,11 @@ class OptionsMenu extends MusicBeatState
 
 	override function update(elapsed:Float)
 	{
+
+		if (FlxG.keys.justPressed.E) {
+			trace(Prefs.data);
+		}
+
 		super.update(elapsed);
 		if (controls.BACK) {
 			legitSave();
@@ -137,9 +142,9 @@ class OptionsMenu extends MusicBeatState
 
 	function acceptShit() {
 		if (curOption[3] == "b") {
+
 			if (controls.ACCEPT || controls.LEFT_P || controls.RIGHT_P) {
 				curOption[2] = !curOption[2];
-				//boolOptionShit(curOption[0]);
 
 				trace(curOption[2]);
 			}
@@ -168,7 +173,7 @@ class OptionsMenu extends MusicBeatState
 
 	function legitSave() {
 
-		trace(optionShit);
+		trace(Prefs.data);
 
 		Prefs.downscroll = optionShit[0][2];
 		Prefs.ghostTapping = optionShit[1][2];
@@ -176,6 +181,8 @@ class OptionsMenu extends MusicBeatState
 		Prefs.showTimeBar = optionShit[3][2];
 		Prefs.keyboardScheme = optionShit[4][2];
 		Prefs.botplay = optionShit[5][2];
+
+		trace(Prefs.data);
 
 		Prefs.save();
 	}
