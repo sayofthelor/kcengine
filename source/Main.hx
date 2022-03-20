@@ -1,5 +1,7 @@
 package;
 
+import djFlixel.ui.FlxMenu;
+import djFlixel.core.Dtext;
 import djFlixel.D;
 import flixel.FlxGame;
 import flixel.FlxState;
